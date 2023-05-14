@@ -39,6 +39,8 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				case token.VAR:
 					analyzeAndFixVariables(pass, decl)
 				}
+			case *ast.FuncDecl:
+				analyzeAndFixFuncs(pass, decl)
 			}
 		}
 	}
@@ -227,6 +229,21 @@ func analyzeAndFixVariables(pass *analysis.Pass, decl *ast.GenDecl) {
 			Pos: decl.Pos(), Message: `variable declarations should be fixed`,
 			SuggestedFixes: []analysis.SuggestedFix{{Message: "Fix", TextEdits: []analysis.TextEdit{
 				{Pos: decl.Pos(), End: decl.End(), NewText: formatNode(pass.Fset, decl)},
+			}}},
+		})
+	}
+}
+
+func analyzeAndFixFuncs(pass *analysis.Pass, decl *ast.FuncDecl) {
+	body := decl.Body
+	changed := analyzeGenericDSL(pass, body)
+	if changed {
+		decl.Body = body
+		b := formatNode(pass.Fset, decl)
+		pass.Report(analysis.Diagnostic{
+			Pos: decl.Pos(), Message: `function declarations should be fixed`,
+			SuggestedFixes: []analysis.SuggestedFix{{Message: "Fix", TextEdits: []analysis.TextEdit{
+				{Pos: decl.Pos(), End: decl.End(), NewText: b},
 			}}},
 		})
 	}
