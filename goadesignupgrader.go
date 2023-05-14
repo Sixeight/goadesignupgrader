@@ -317,6 +317,10 @@ func analyzeGenericDSL(pass *analysis.Pass, node ast.Node) bool {
 			switch expr.Name {
 			case "Integer":
 				changed = analyzeInteger(pass, expr) || changed
+			case "Number":
+				changed = analyzeNumber(pass, expr) || changed
+			case "File":
+				changed = analyzeFile(pass, expr) || changed
 			}
 		case *ast.CallExpr:
 			ident, ok := expr.Fun.(*ast.Ident)
@@ -445,6 +449,18 @@ func analyzeImport(pass *analysis.Pass, spec *ast.ImportSpec) bool {
 func analyzeInteger(pass *analysis.Pass, ident *ast.Ident) bool {
 	pass.Report(analysis.Diagnostic{Pos: ident.Pos(), Message: `Integer should be replaced with Int`})
 	ident.Name = "Int"
+	return true
+}
+
+func analyzeNumber(pass *analysis.Pass, ident *ast.Ident) bool {
+	pass.Report(analysis.Diagnostic{Pos: ident.Pos(), Message: `Number should be replaced with Float64`})
+	ident.Name = "Float64"
+	return true
+}
+
+func analyzeFile(pass *analysis.Pass, ident *ast.Ident) bool {
+	pass.Report(analysis.Diagnostic{Pos: ident.Pos(), Message: `File should be replaced with Bytes`})
+	ident.Name = "Bytes"
 	return true
 }
 

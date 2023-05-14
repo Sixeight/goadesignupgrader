@@ -37,6 +37,8 @@ $ goadesignupgrader -fix [design package]; gofmt -s -w .
 
 * `DateTime`
 * `Integer`
+* `Number`
+* `File`
 
 ### Supported DSLs
 
